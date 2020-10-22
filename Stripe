@@ -1,0 +1,50 @@
+---->>> POD
+  pod 'Stripe', '~> 4.0.3'
+  
+----->>. AppDelegate <<----   
+import Stripe 
+
+ Stripe.setDefaultPublishableKey("pk_test_51HBOhjD9LygsRxOOAKtf8sFuUM88I1CkNifp96Ane2CPNxKjWBQ5a21gcNxvvugUsUpVDVpqm7rymQnljXk7cknH004iIEL8pp")
+ 
+ 
+ ----->>. CheoutPaymentViewController <<----   
+import Stripe
+
+
+ func setStripe() {
+
+        // Initiate the card
+        
+        var stripCard = STPCard()
+
+        // Split the expiration date to extract Month & Year
+        if self.txtexpirydate.text!.isEmpty == false {
+            let expirationDate = self.txtexpirydate.text?.components(separatedBy: "/")
+            let expMonth = UInt((expirationDate![0] as! NSString).intValue)
+            let expYear = UInt((expirationDate![1] as! NSString).intValue)
+
+            // Send the card info to Strip to get the token
+            stripCard.number = self.txtcardno.text
+            stripCard.cvc = self.txtcvvcode.text
+            stripCard.expMonth = expMonth
+            stripCard.expYear = expYear
+
+        }
+
+        STPAPIClient.shared().createToken(with: stripCard, completion: { (token, error) -> Void in
+
+            if error != nil {
+
+                self.view.makeToast(error?.localizedDescription)
+                print("error")
+                 print(error?.localizedDescription)
+                return
+            }
+            print(token?.tokenId ?? "")
+
+            self.objStipeToken = token?.tokenId ?? ""
+            self.callPaymentAPI()
+            return
+        })
+        
+    }
