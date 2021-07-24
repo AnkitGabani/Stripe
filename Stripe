@@ -1,5 +1,5 @@
 ---->>> POD
-  pod 'Stripe', '~> 4.0.3'
+  pod 'Stripe', '~> 19.1'
   
 ----->>. AppDelegate <<----   
 import Stripe 
@@ -10,40 +10,41 @@ import Stripe
  ----->>. CheoutPaymentViewController <<----   
 import Stripe
 
-
- func setStripe() {
-
+    
+    func setStripe() {
+        
         // Initiate the card
         
-        var stripCard = STPCard()
-
+        //var stripCard = STPCard()
+        
+        let stripCard: STPCardParams = STPCardParams()
+        
         // Split the expiration date to extract Month & Year
-        if self.txtexpirydate.text!.isEmpty == false {
-            let expirationDate = self.txtexpirydate.text?.components(separatedBy: "/")
+        if self.txtDate.text!.isEmpty == false {
+            let expirationDate = self.txtDate.text?.components(separatedBy: "/")
             let expMonth = UInt((expirationDate![0] as! NSString).intValue)
             let expYear = UInt((expirationDate![1] as! NSString).intValue)
-
+            
             // Send the card info to Strip to get the token
-            stripCard.number = self.txtcardno.text
-            stripCard.cvc = self.txtcvvcode.text
+            stripCard.number = self.txtCard.text
+            stripCard.cvc = self.txtCvv.text
             stripCard.expMonth = expMonth
             stripCard.expYear = expYear
-
+            
         }
-
-        STPAPIClient.shared().createToken(with: stripCard, completion: { (token, error) -> Void in
-
+        
+        STPAPIClient.shared().createToken(withCard: stripCard, completion: { (token, error) -> Void in
+            
             if error != nil {
-
+                
                 self.view.makeToast(error?.localizedDescription)
                 print("error")
-                 print(error?.localizedDescription)
+                print(error?.localizedDescription)
                 return
             }
             print(token?.tokenId ?? "")
-
+            
             self.objStipeToken = token?.tokenId ?? ""
-            self.callPaymentAPI()
             return
         })
         
